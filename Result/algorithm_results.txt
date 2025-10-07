@@ -1,0 +1,142 @@
+=== Algorithm Comparison Experiment ===
+Date: Tue Oct  7 00:48:51 AEDT 2025
+Configuration: 4 MPI processes, 2 OpenMP threads each
+Dataset: coronavirus.fasta
+
+=== Simple Sliding Window Algorithm ===
+=== Hybrid MPI+OpenMP DNA Sequence Alignment ===
+MPI Processes: 4
+OpenMP Threads per process: 2
+Total parallel workers: 8
+MPI Threading support: Available
+
+
+=== Loading FASTA Files ===
+Reference file: coronavirus.fasta
+Query file: coronavirus.fasta
+Algorithm: simple
+Reference DNA loaded: 11925 bases
+Query sequences loaded: 9 sequences
+Sequence statistics:
+  Total bases: 26940
+  Average length: 2993.33 bases
+  Length range: 237 - 11925 bases
+
+=== Hybrid MPI+OpenMP DNA Sequence Alignment ===
+Algorithm: Simple Sliding Window
+Parallelization: MPI (distributed) + OpenMP (shared memory)
+Reference DNA length: 11925 bases
+Number of query sequences: 9
+MPI processes: 4
+OpenMP threads per process: 2
+Total parallel workers: 8
+Distributing tasks using MPI_Scatterv...
+Load balanced query distribution:
+Process 0: 1 queries, load = 142205625
+Process 1: 1 queries, load = 95590800
+Process 2: 2 queries, load = 43144650
+Process 3: 5 queries, load = 40318425
+Master (rank 0) will process 1 queries
+Process 1 will process 1 queries
+Process 2 will process 2 queries
+Process 3 will process 5 queries
+Master: About to process 1 queries with 2 OpenMP threads
+Master Thread 0 processed query 0 (lcl|NC_034972.1_cds_...) (score: 3382/11925)
+Master: Completed processing all queries
+Process 2 Thread 1 processed query 4 (lcl|NC_034972.1_cds_...)  (score: 92/237)
+Process 3 Thread 0 processed query 7 (lcl|NC_034972.1_cds_...)  (score: 333/1170)
+Process 3 Thread 1 processed query 5 (lcl|NC_034972.1_cds_...)  (score: 240/747)
+Process 3 Thread 0 processed query 3 (lcl|NC_034972.1_cds_...)  (score: 218/645)
+Process 3 Thread 1 processed query 6 (lcl|NC_034972.1_cds_...)  (score: 185/501)
+Process 3 Thread 0 processed query 8 (lcl|NC_034972.1_cds_...)  (score: 119/318)
+Process 1 Thread 0 processed query 1 (lcl|NC_034972.1_cds_...)  (score: 380/8016)
+Process 2 Thread 0 processed query 2 (lcl|NC_034972.1_cds_...)  (score: 419/3381)
+
+=== Alignment Results ===
+Query                   Header  Position   Score      Query Sequence          Best Match
+----------------------------------------------------------------------------------------
+    0lcl|NC_034972.1_cds_YP...         0    3382/11925  ATGGCTAACCAATAT...  ATGGCTAACCAATAT...  (28.4%)
+    1lcl|NC_034972.1_cds_YP...         8     380/8016  GAGCCCTGTAGTGAG...  CCAATATGTCCTGCG...  (4.7%)
+    2lcl|NC_034972.1_cds_YP...      4452     419/3381  ATGGCTCTCATTTTT...  ACTAGTACCACTGTT...  (12.4%)
+    3lcl|NC_034972.1_cds_YP...      9629     218/645  ATGATAGGTGGTCTT...  TAAACACAAGATGGT...  (33.8%)
+    4lcl|NC_034972.1_cds_YP...      5770      92/237  ATGTTACCCTCGTTT...  AACTCTCCGATTTTG...  (38.8%)
+    5lcl|NC_034972.1_cds_YP...      4632     240/747  ATGGTACTCTTTTGT...  GTCGGTCATGGTGAT...  (32.1%)
+    6lcl|NC_034972.1_cds_YP...      6567     185/501  ATGATTTTGGTTTTC...  GTCTTGTTGTCTAGT...  (36.9%)
+    7lcl|NC_034972.1_cds_YP...      8295     333/1170  ATGAGTTCCAACGTC...  TTTGAACATGCGTCT...  (28.5%)
+    8lcl|NC_034972.1_cds_YP...     11307     119/318  ATGTATTGTTTGTTG...  GATGATGTTGTTATA...  (37.4%)
+
+Total execution time: 25 ms
+Algorithm used: Simple Sliding Window
+Threading model: 4 MPI processes × 2 OpenMP threads = 8 total workers
+real 0.71
+user 0.10
+sys 0.04
+
+=== Smith-Waterman Algorithm ===
+=== Hybrid MPI+OpenMP DNA Sequence Alignment ===
+MPI Processes: 4
+OpenMP Threads per process: 2
+Total parallel workers: 8
+MPI Threading support: Available
+
+
+=== Loading FASTA Files ===
+Reference file: coronavirus.fasta
+Query file: coronavirus.fasta
+Algorithm: sw
+Reference DNA loaded: 11925 bases
+Query sequences loaded: 9 sequences
+Sequence statistics:
+  Total bases: 26940
+  Average length: 2993.33 bases
+  Length range: 237 - 11925 bases
+
+=== Hybrid MPI+OpenMP DNA Sequence Alignment ===
+Algorithm: Smith-Waterman Local Alignment
+Parallelization: MPI (distributed) + OpenMP (shared memory)
+Reference DNA length: 11925 bases
+Number of query sequences: 9
+MPI processes: 4
+OpenMP threads per process: 2
+Total parallel workers: 8
+Distributing tasks using MPI_Scatterv...
+Load balanced query distribution:
+Process 0: 1 queries, load = 142205625
+Process 1: 1 queries, load = 95590800
+Process 2: 2 queries, load = 43144650
+Process 3: 5 queries, load = 40318425
+Master (rank 0) will process 1 queries
+Process 1 will process 1 queries
+Process 2 will process 2 queries
+Process 3 will process 5 queries
+Master: About to process 1 queries with 2 OpenMP threads
+Master Thread 0 processed query 0 (lcl|NC_034972.1_cds_...) (score: 3382/11925)
+Master: Completed processing all queries
+Process 2 Thread 1 processed query 4 (lcl|NC_034972.1_cds_...)  (score: 234/237)
+Process 3 Thread 1 processed query 5 (lcl|NC_034972.1_cds_...)  (score: 665/747)
+Process 3 Thread 0 processed query 7 (lcl|NC_034972.1_cds_...)  (score: 850/1170)
+Process 2 Thread 0 processed query 2 (lcl|NC_034972.1_cds_...)  (score: 901/3381)
+Process 3 Thread 1 processed query 3 (lcl|NC_034972.1_cds_...)  (score: 588/645)
+Process 3 Thread 0 processed query 6 (lcl|NC_034972.1_cds_...)  (score: 461/501)
+Process 3 Thread 1 processed query 8 (lcl|NC_034972.1_cds_...)  (score: 298/318)
+Process 1 Thread 0 processed query 1 (lcl|NC_034972.1_cds_...)  (score: 926/8016)
+
+=== Alignment Results ===
+Query                   Header  Position   Score      Query Sequence          Best Match
+----------------------------------------------------------------------------------------
+    0lcl|NC_034972.1_cds_YP...         0    3382/11925  ATGGCTAACCAATAT...  ATGGCTAACCAATAT...  (28.4%)
+    1lcl|NC_034972.1_cds_YP...     11925     926/8016  GAGCCCTGTAGTGAG...               Empty  (11.6%)
+    2lcl|NC_034972.1_cds_YP...     11925     901/3381  ATGGCTCTCATTTTT...               Empty  (26.6%)
+    3lcl|NC_034972.1_cds_YP...     11171     588/645  ATGATAGGTGGTCTT...  TG-CCAG-GTTGTTT...  (91.2%)
+    4lcl|NC_034972.1_cds_YP...     11621     234/237  ATGTTACCCTCGTTT...  TATTAC-CCACGT-T...  (98.7%)
+    5lcl|NC_034972.1_cds_YP...     11071     665/747  ATGGTACTCTTTTGT...  AAGGTTC--T-C-GG...  (89.0%)
+    6lcl|NC_034972.1_cds_YP...     11423     461/501  ATGATTTTGGTTTTC...  TGGTTTT-GGTTTTT...  (92.0%)
+    7lcl|NC_034972.1_cds_YP...     10698     850/1170  ATGAGTTCCAACGTC...  A-TGAGTTTTGAAAT...  (72.6%)
+    8lcl|NC_034972.1_cds_YP...     11442     298/318  ATGTATTGTTTGTTG...  G-TACTGTTAG-TTG...  (93.7%)
+
+Total execution time: 1435 ms
+Algorithm used: Smith-Waterman
+Threading model: 4 MPI processes × 2 OpenMP threads = 8 total workers
+real 1.64
+user 2.64
+sys 0.52
