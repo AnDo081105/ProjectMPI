@@ -306,3 +306,6 @@ Total parallel workers: 8
 ![[Pasted image 20251008002350.png]]
 - **Analysis**
 The results show the contrast in performance efficiency. The Simple Sliding Window algorithm completes execution in 25ms, while the Smith-Waterman take 1435. This significant difference highlights the difference in computation complexity of the Smith-Waterman algorithm in compare to my Simple Sliding Window algorithm. 
+
+## Acknowlegement
+I acknowledge the use of Generative AI to assist in implementing MPI with OpenMP and implementing the Smith-Waterson algorithm. All generated content was edited and reviewed to ensure accuracy and functionality.
