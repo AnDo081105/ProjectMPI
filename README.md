@@ -12,7 +12,8 @@ The program uses a hybrid parallelization approach:
 - OpenMP: Parallelizes alignment computations within each process
 
 ## Requirements
-- MPI implementation (OpenMPI)
+- MPI implementation (OpenMPT)
+- Compiler support `-fopenmp`
 - C++11 or later compiler
 - FASTA format input files
 
