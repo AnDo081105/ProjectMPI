@@ -62,7 +62,7 @@ struct AlignmentResult {
         : queryIndex(qi), position(pos), score(s), query(q), matchedSegment(match) {}
 };
 
-// Structure for efficient MPI communication
+// Structure for MPI communication
 struct QueryData {
     int queryIndex;
     int queryLength;
@@ -259,54 +259,63 @@ AlignmentResult alignSequence(const string& query, int queryIndex) {
 }
 
 // Smith-Waterman local alignment algorithm implementation with OpenMP optimization
-AlignmentResult smithWatermanAlignment(const string& query, int queryIndex) {
-    if (REFERENCE_DNA.empty() || query.empty()) {
+AlignmentResult smithWatermanAlignment(const string &query, int queryIndex)
+{
+    if (REFERENCE_DNA.empty() || query.empty())
+    {
         return AlignmentResult(queryIndex, -1, -1, query, "");
     }
-    
+
     const int MATCH_SCORE = 2;
     const int MISMATCH_SCORE = -1;
     const int GAP_PENALTY = -1;
-    
+
     int queryLen = query.length();
     int refLen = REFERENCE_DNA.length();
-    
+
     // Initialize scoring matrix
     vector<vector<int>> scoreMatrix(queryLen + 1, vector<int>(refLen + 1, 0));
-    
+
     int maxScore = 0;
     int maxI = 0, maxJ = 0;
-    
+
     // Fill the scoring matrix using Smith-Waterman algorithm
     // We can parallelize along anti-diagonals since they have no dependencies
-    for (int diag = 1; diag <= queryLen + refLen; diag++) {
+    for (int diag = 1; diag <= queryLen + refLen; diag++)
+    {
         int startI = max(1, diag - refLen);
         int endI = min(queryLen, diag - 1);
-        
-        if (startI <= endI) {
-            #pragma omp parallel for schedule(static) reduction(max:maxScore)
-            for (int i = startI; i <= endI; i++) {
+
+        if (startI <= endI)
+        {
+#pragma omp parallel for schedule(static) reduction(max : maxScore)
+            for (int i = startI; i <= endI; i++)
+            {
                 int j = diag - i;
-                if (j >= 1 && j <= refLen) {
+                if (j >= 1 && j <= refLen)
+                {
                     // Safety bounds checking
-                    if (i-1 < 0 || j-1 < 0 || i-1 >= queryLen || j-1 >= refLen) {
+                    if (i - 1 < 0 || j - 1 < 0 || i - 1 >= queryLen || j - 1 >= refLen)
+                    {
                         continue;
                     }
-                    
+
                     // Calculate scores for three possible moves
-                    int matchScore = scoreMatrix[i-1][j-1] + 
-                                   ((query[i-1] == REFERENCE_DNA[j-1]) ? MATCH_SCORE : MISMATCH_SCORE);
-                    int deleteScore = scoreMatrix[i-1][j] + GAP_PENALTY;
-                    int insertScore = scoreMatrix[i][j-1] + GAP_PENALTY;
-                    
+                    int matchScore = scoreMatrix[i - 1][j - 1] +
+                                     ((query[i - 1] == REFERENCE_DNA[j - 1]) ? MATCH_SCORE : MISMATCH_SCORE);
+                    int deleteScore = scoreMatrix[i - 1][j] + GAP_PENALTY;
+                    int insertScore = scoreMatrix[i][j - 1] + GAP_PENALTY;
+
                     // Take maximum of the three scores, or 0 (local alignment)
                     scoreMatrix[i][j] = max({0, matchScore, deleteScore, insertScore});
-                    
+
                     // Track the maximum score and its position (thread-safe with reduction)
-                    if (scoreMatrix[i][j] > maxScore) {
-                        #pragma omp critical(max_update)
+                    if (scoreMatrix[i][j] > maxScore)
+                    {
+#pragma omp critical(max_update)
                         {
-                            if (scoreMatrix[i][j] > maxScore) {
+                            if (scoreMatrix[i][j] > maxScore)
+                            {
                                 maxScore = scoreMatrix[i][j];
                                 maxI = i;
                                 maxJ = j;
@@ -317,63 +326,67 @@ AlignmentResult smithWatermanAlignment(const string& query, int queryIndex) {
             }
         }
     }
-    
+
     // Traceback to find the optimal alignment
     string alignedQuery = "";
     string alignedRef = "";
     int i = maxI, j = maxJ;
-    
-    int tracebackSteps = 0;
-    const int MAX_TRACEBACK_STEPS = 50000; // Prevent infinite loops
-    
-    while (i > 0 && j > 0 && scoreMatrix[i][j] > 0 && tracebackSteps < MAX_TRACEBACK_STEPS) {
-        tracebackSteps++;
-        
+
+    while (i > 0 && j > 0 && scoreMatrix[i][j] > 0)
+    {
         // Safety bounds checking for traceback
-        if (i-1 < 0 || j-1 < 0 || i-1 >= queryLen || j-1 >= refLen) {
+        if (i - 1 < 0 || j - 1 < 0 || i - 1 >= queryLen || j - 1 >= refLen)
+        {
             break;
         }
-        
+
         int currentScore = scoreMatrix[i][j];
-        int matchScore = scoreMatrix[i-1][j-1] + 
-                        ((query[i-1] == REFERENCE_DNA[j-1]) ? MATCH_SCORE : MISMATCH_SCORE);
-        int deleteScore = scoreMatrix[i-1][j] + GAP_PENALTY;
-        int insertScore = scoreMatrix[i][j-1] + GAP_PENALTY;
-        
-        if (currentScore == matchScore) {
+        int matchScore = scoreMatrix[i - 1][j - 1] +
+                         ((query[i - 1] == REFERENCE_DNA[j - 1]) ? MATCH_SCORE : MISMATCH_SCORE);
+        int deleteScore = scoreMatrix[i - 1][j] + GAP_PENALTY;
+        int insertScore = scoreMatrix[i][j - 1] + GAP_PENALTY;
+
+        if (currentScore == matchScore)
+        {
             // Match or mismatch
-            if (i-1 >= 0 && i-1 < queryLen && j-1 >= 0 && j-1 < refLen) {
-                alignedQuery = query[i-1] + alignedQuery;
-                alignedRef = REFERENCE_DNA[j-1] + alignedRef;
-            }
-            i--; j--;
-        } else if (currentScore == deleteScore) {
-            // Deletion in reference (gap in query)
-            if (j-1 >= 0 && j-1 < refLen) {
-                alignedQuery = "-" + alignedQuery;
-                alignedRef = REFERENCE_DNA[j-1] + alignedRef;
+            if (i - 1 >= 0 && i - 1 < queryLen && j - 1 >= 0 && j - 1 < refLen)
+            {
+                alignedQuery = query[i - 1] + alignedQuery;
+                alignedRef = REFERENCE_DNA[j - 1] + alignedRef;
             }
             i--;
-        } else if (currentScore == insertScore) {
+            j--;
+        }
+        else if (currentScore == deleteScore)
+        {
+            // Deletion in reference (gap in query)
+            if (j - 1 >= 0 && j - 1 < refLen)
+            {
+                alignedQuery = "-" + alignedQuery;
+                alignedRef = REFERENCE_DNA[j - 1] + alignedRef;
+            }
+            i--;
+        }
+        else if (currentScore == insertScore)
+        {
             // Insertion in reference (gap in reference)
-            if (i-1 >= 0 && i-1 < queryLen) {
-                alignedQuery = query[i-1] + alignedQuery;
+            if (i - 1 >= 0 && i - 1 < queryLen)
+            {
+                alignedQuery = query[i - 1] + alignedQuery;
                 alignedRef = "-" + alignedRef;
             }
             j--;
-        } else {
-            // Fallback case 
+        }
+        else
+        {
+            // Fallback case
+            break;
         }
     }
-    
-    if (tracebackSteps >= MAX_TRACEBACK_STEPS) {
-        cout << "Warning: Query " << queryIndex << " - traceback terminated due to step limit" << endl;
-        cout.flush();
-    }
-    
+
     // Calculate the starting position in reference (accounting for traceback)
     int refStartPos = j;
-    
+
     // Return result with Smith-Waterman score and aligned segment
     return AlignmentResult(queryIndex, refStartPos, maxScore, query, alignedRef);
 }
