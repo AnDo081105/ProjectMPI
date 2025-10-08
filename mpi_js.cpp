@@ -37,7 +37,7 @@ vector<FASTASequence> parseFASTA(const string& filename) {
                 sequences.push_back({currentHeader, currentSeq});
                 currentSeq.clear();
             }
-            // Safely extract header (skip '>' character)
+            // Extract header (skip '>' character)
             currentHeader = (line.length() > 1) ? line.substr(1) : "";
         } else {
             currentSeq += line;
@@ -195,38 +195,6 @@ string cleanDNASequence(const string& sequence) {
     }
     return cleaned;
 }
-
-// Generate random DNA query sequences
-vector<string> generateQuerySequences(int numQueries, int queryLength) {
-    vector<string> queries;
-    vector<char> bases = {'A', 'T', 'C', 'G'};
-    random_device rd;
-    mt19937 gen(rd());
-    uniform_int_distribution<> dis(0, 3);
-    
-    for (int i = 0; i < numQueries; i++) {
-        string query;
-        for (int j = 0; j < queryLength; j++) {
-            query += bases[dis(gen)];
-        }
-        queries.push_back(query);
-    }
-    
-    // Add some sequences that match parts of reference DNA for testing
-    if (numQueries > 0) {
-        queries[0] = "ATCGATCGATCGATCG"; // Should match beginning
-    }
-    if (numQueries > 1) {
-        queries[1] = "CACTGCAGGCCGGAGC"; // Should match part of reference
-    }
-    if (numQueries > 2) {
-        queries[2] = "GGAAGGGACAGATTAA"; // Should match part of reference
-    }
-    
-    return queries;
-}
-
-
 
 // Calculate alignment score using simplified algorithm with OpenMP optimization
 // Returns the best alignment score for the query against reference
@@ -479,13 +447,6 @@ void masterProcess(int numProcesses, const vector<string>& queries, const vector
         sendCounts[minLoadProcess]++;
     }
     
-    // Debug: Show load balancing distribution
-    cout << "Load balanced query distribution:" << endl;
-    for (int p = 0; p < numProcesses; p++) {
-        cout << "Process " << p << ": " << sendCounts[p] << " queries, load = " 
-             << processLoad[p] << endl;
-    }
-    
     // Reorder allQueryData to match the load-balanced distribution
     vector<QueryData> balancedQueryData;
     for (int p = 0; p < numProcesses; p++) {
@@ -719,8 +680,8 @@ int main(int argc, char* argv[]) {
             cerr << "Error: Need at least 2 MPI processes for meaningful parallelization" << endl;
             cerr << "Usage: mpirun -np <procs> ./mpi_dna_alignment <reference.fasta> <queries.fasta> [algorithm]" << endl;
             cerr << "  reference.fasta: Reference genome file" << endl;
-            cerr << "  queries.fasta:   Query sequences file" << endl;
-            cerr << "  algorithm:       'simple' or 'sw' (default: simple)" << endl;
+            cerr << "  queries.fasta: Query sequences file" << endl;
+            cerr << "  algorithm: 'simple' or 'sw' (default: simple)" << endl;
         }
         MPI_Finalize();
         return 1;
@@ -733,8 +694,8 @@ int main(int argc, char* argv[]) {
         if (rank == 0) {
             cerr << "Usage: mpirun -np <procs> ./mpi_dna_alignment <reference.fasta> <queries.fasta> [algorithm]" << endl;
             cerr << "  reference.fasta: Reference genome file" << endl;
-            cerr << "  queries.fasta:   Query sequences file" << endl;
-            cerr << "  algorithm:       'simple' or 'sw' (default: simple)" << endl;
+            cerr << "  queries.fasta: Query sequences file" << endl;
+            cerr << "  algorithm: 'simple' or 'sw' (default: simple)" << endl;
         }
         MPI_Finalize();
         return 1;
