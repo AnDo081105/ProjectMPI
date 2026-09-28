@@ -60,7 +60,7 @@ if (getenv("OMP_NUM_THREADS") == nullptr) {
 ```
 Adaptive threading since more number of thread than the number of core can bottleneck the system, making multithreading redundant.
 #### Data generation
-We will generate random query sentences 
+The data is obtained from Kaggle. This is a coronavirus FASTA file
 #### Data Structure conversion
 ```cpp
 // Convert strings to fixed-size MPI structures
