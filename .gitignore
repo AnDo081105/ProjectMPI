@@ -1,0 +1,12 @@
+.conda
+.venv
+venv/
+__pycache__/
+
+*.pyc
+.vscode/
+.obsidian/
+
+/mpi_dna_alignment
+/mpi_dna_alignment.exe
+.ipynb_checkpoints/
